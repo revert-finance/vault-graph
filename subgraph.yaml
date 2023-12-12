@@ -1,0 +1,69 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: V3Vault
+    network: matic
+    source:
+      address: "0x45500644ea331de44fe36142078fb53684d80ec7"
+      abi: V3Vault
+      startBlock: 50787321
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Borrow
+        - Deposit
+        - ExchangeRateUpdate
+        - Liquidate
+        - OwnershipTransferred
+        - Repay
+        - SetLimits
+        - SetReserveFactor
+        - SetReserveProtectionFactor
+        - SetTokenConfig
+        - SetTransformer
+        - Transfer
+        - Withdraw
+        - WithdrawCollateral
+        - WithdrawReserves
+      abis:
+        - name: V3Vault
+          file: ./abis/V3Vault.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Borrow(indexed uint256,indexed address,uint256,uint256)
+          handler: handleBorrow
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: ExchangeRateUpdate(uint256,uint256)
+          handler: handleExchangeRateUpdate
+        - event: Liquidate(indexed uint256,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLiquidate
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Repay(indexed uint256,indexed address,indexed address,uint256,uint256)
+          handler: handleRepay
+        - event: SetLimits(uint256,uint256)
+          handler: handleSetLimits
+        - event: SetReserveFactor(uint32)
+          handler: handleSetReserveFactor
+        - event: SetReserveProtectionFactor(uint32)
+          handler: handleSetReserveProtectionFactor
+        - event: SetTokenConfig(address,uint32,uint216)
+          handler: handleSetTokenConfig
+        - event: SetTransformer(address,bool)
+          handler: handleSetTransformer
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: WithdrawCollateral(indexed uint256,indexed address,address,uint128,uint256,uint256)
+          handler: handleWithdrawCollateral
+        - event: WithdrawReserves(uint256,address)
+          handler: handleWithdrawReserves
+      file: ./src/v-3-vault.ts
