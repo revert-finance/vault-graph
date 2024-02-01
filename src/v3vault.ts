@@ -34,13 +34,14 @@ import {
 const ZERO_BI = BigInt.fromI32(0)
 const Q96 = BigDecimal.fromString(BigInt.fromI32(2).pow(96).toString())
 
+// max 1 snapshot per block is saved
 function createLoanSnapshot(tokenId: BigInt, loan: Loan, event: ethereum.Event) : void {
 
   // get current values
   let vault = V3Vault.bind(event.address)
   let info = vault.loanInfo(tokenId)
 
-  let snapshot = new LoanSnapshot(event.transaction.hash.concatI32(event.logIndex.toI32()))
+  let snapshot = new LoanSnapshot(loan.id.concat(event.address).concat(getBytes(event.block.number)))
   
   snapshot.loan = loan.id
 
@@ -58,8 +59,8 @@ function createLoanSnapshot(tokenId: BigInt, loan: Loan, event: ethereum.Event) 
   snapshot.save()
 }
 
-function getId(tokenId: BigInt) : Bytes {
-  return Bytes.fromByteArray(Bytes.fromBigInt(tokenId))
+function getBytes(number: BigInt) : Bytes {
+  return Bytes.fromByteArray(Bytes.fromBigInt(number))
 }
 
 function getVault(vault: Address): Vault {
@@ -75,9 +76,9 @@ function getVault(vault: Address): Vault {
 }
 
 function getLoan(tokenId: BigInt, vault: Address): Loan {
-  let loan = Loan.load(getId(tokenId).concat(vault))
+  let loan = Loan.load(getBytes(tokenId).concat(vault))
   if (!loan) {
-    loan = new Loan(getId(tokenId).concat(vault))
+    loan = new Loan(getBytes(tokenId).concat(vault))
     loan.tokenId = tokenId
     loan.vault = getVault(vault).id
     loan.isExited = false
@@ -100,7 +101,7 @@ export function handleAdd(event: Add): void {
   let loan = getLoan(event.params.tokenId, event.address)
   
   if (event.params.oldTokenId.gt(ZERO_BI)) {
-    let oldLoan = Loan.load(getId(event.params.oldTokenId))!
+    let oldLoan = Loan.load(getBytes(event.params.oldTokenId))!
     loan.shares = oldLoan.shares
     loan.previousLoan = oldLoan.id
   } else {
