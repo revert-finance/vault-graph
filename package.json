@@ -4,11 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ kalinbas/revert-vault-polygon",
-    "create-local": "graph create --node http://localhost:8020/ kalinbas/revert-vault-polygon",
-    "remove-local": "graph remove --node http://localhost:8020/ kalinbas/revert-vault-polygon",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 kalinbas/revert-vault-polygon",
-    "test": "graph test"
+    "deploy": "graph deploy --product hosted-service kalinbas/revert-vault-polygon"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.63.1",
