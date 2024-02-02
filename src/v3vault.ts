@@ -65,7 +65,7 @@ function createLenderSnapshot(lender: Lender, event: ethereum.Event) : void {
 
   // get current values
   let vault = V3Vault.bind(event.address)
-  let lent = vault.lendInfo(Address.fromBytes(lender.id))
+  let lent = vault.lendInfo(Address.fromBytes(lender.address))
 
   let snapshot = new LenderSnapshot(lender.id.concat(event.address).concat(getBytes(event.block.number)))
   
@@ -112,6 +112,7 @@ function getLender(address: Address, vaultAddress: Address): Lender {
   let lender = Lender.load(address.concat(vaultAddress))
   if (!lender) {
     lender = new Lender(address.concat(vaultAddress))
+    lender.address = address
     lender.vault = getVault(vaultAddress).id
     lender.shares = ZERO_BI;
   }

@@ -6,6 +6,7 @@ type Vault @entity {
 
 type Lender @entity {
   id: Bytes!
+  address: Bytes!
   vault: Vault!
   shares: BigInt!
 }
