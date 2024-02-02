@@ -24,6 +24,7 @@ import {
 import {
   Vault,
   Lender,
+  LenderSnapshot,
   Loan,
   LoanSnapshot,
   DailyExchangeRate,
@@ -35,11 +36,11 @@ const ZERO_BI = BigInt.fromI32(0)
 const Q96 = BigDecimal.fromString(BigInt.fromI32(2).pow(96).toString())
 
 // max 1 snapshot per block is saved
-function createLoanSnapshot(tokenId: BigInt, loan: Loan, event: ethereum.Event) : void {
+function createLoanSnapshot(loan: Loan, event: ethereum.Event) : void {
 
   // get current values
   let vault = V3Vault.bind(event.address)
-  let info = vault.loanInfo(tokenId)
+  let info = vault.loanInfo(loan.tokenId)
 
   let snapshot = new LoanSnapshot(loan.id.concat(event.address).concat(getBytes(event.block.number)))
   
@@ -59,38 +60,59 @@ function createLoanSnapshot(tokenId: BigInt, loan: Loan, event: ethereum.Event) 
   snapshot.save()
 }
 
+// max 1 snapshot per block is saved
+function createLenderSnapshot(lender: Lender, event: ethereum.Event) : void {
+
+  // get current values
+  let vault = V3Vault.bind(event.address)
+  let lent = vault.lendInfo(Address.fromBytes(lender.id))
+
+  let snapshot = new LenderSnapshot(lender.id.concat(event.address).concat(getBytes(event.block.number)))
+  
+  snapshot.lender = lender.id
+
+  snapshot.lent = lent
+  snapshot.shares = lender.shares
+
+  snapshot.blockNumber = event.block.number
+  snapshot.blockTimestamp = event.block.timestamp
+  snapshot.transactionHash = event.transaction.hash
+
+  snapshot.save()
+}
+
 function getBytes(number: BigInt) : Bytes {
   return Bytes.fromByteArray(Bytes.fromBigInt(number))
 }
 
-function getVault(vault: Address): Vault {
-  let v = Vault.load(vault)
-  if (!v) {
-    let vaultContract = V3Vault.bind(vault)
-    v = new Vault(vault)
-    v.asset = vaultContract.asset()
-    v.decimals = BigInt.fromI32(vaultContract.decimals())
-    v.save()
+function getVault(address: Address): Vault {
+  let vault = Vault.load(address)
+  if (!vault) {
+    let vaultContract = V3Vault.bind(address)
+    vault = new Vault(address)
+    vault.asset = vaultContract.asset()
+    vault.decimals = BigInt.fromI32(vaultContract.decimals())
+    vault.save()
   }
-  return v
+  return vault
 }
 
-function getLoan(tokenId: BigInt, vault: Address): Loan {
-  let loan = Loan.load(getBytes(tokenId).concat(vault))
+function getLoan(tokenId: BigInt, vaultAddress: Address): Loan {
+  let loan = Loan.load(getBytes(tokenId).concat(vaultAddress))
   if (!loan) {
-    loan = new Loan(getBytes(tokenId).concat(vault))
+    loan = new Loan(getBytes(tokenId).concat(vaultAddress))
     loan.tokenId = tokenId
-    loan.vault = getVault(vault).id
+    loan.vault = getVault(vaultAddress).id
     loan.isExited = false
   }
   return loan
 }
 
-function getLender(address: Bytes, vault: Address): Lender {
-  let lender = Lender.load(address.concat(vault))
+function getLender(address: Address, vaultAddress: Address): Lender {
+  let lender = Lender.load(address.concat(vaultAddress))
   if (!lender) {
-    lender = new Lender(address.concat(vault))
-    lender.vault = getVault(vault).id
+    lender = new Lender(address.concat(vaultAddress))
+    lender.vault = getVault(vaultAddress).id
     lender.shares = ZERO_BI;
   }
   return lender
@@ -111,7 +133,7 @@ export function handleAdd(event: Add): void {
   loan.owner = event.params.owner
   loan.save()
 
-  createLoanSnapshot(event.params.tokenId, loan, event)
+  createLoanSnapshot(loan, event)
 }
 
 export function handleRemove(event: Remove): void {
@@ -119,7 +141,7 @@ export function handleRemove(event: Remove): void {
   loan.isExited = true
   loan.save()
 
-  createLoanSnapshot(event.params.tokenId, loan, event)
+  createLoanSnapshot(loan, event)
 }
 
 export function handleBorrow(event: BorrowEvent): void {
@@ -127,7 +149,7 @@ export function handleBorrow(event: BorrowEvent): void {
   loan.shares = loan.shares.plus(event.params.shares)
   loan.save()
 
-  createLoanSnapshot(event.params.tokenId, loan, event)
+  createLoanSnapshot(loan, event)
 }
 
 export function handleRepay(event: RepayEvent): void {
@@ -135,24 +157,28 @@ export function handleRepay(event: RepayEvent): void {
   loan.shares = loan.shares.minus(event.params.shares)
   loan.save()
 
-  createLoanSnapshot(event.params.tokenId, loan, event)
+  createLoanSnapshot(loan, event)
 }
 
 export function handleDeposit(event: DepositEvent): void {
   let lender = getLender(event.params.owner, event.address)
   lender.shares = lender.shares.plus(event.params.shares);
   lender.save()
+
+  createLenderSnapshot(lender, event)
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
   let lender = getLender(event.params.owner, event.address)
   lender.shares = lender.shares.minus(event.params.shares);
   lender.save()
+
+  createLenderSnapshot(lender, event)
 }
 
 export function handleWithdrawCollateral(event: WithdrawCollateralEvent) : void {
   let loan = getLoan(event.params.tokenId, event.address)
-  createLoanSnapshot(event.params.tokenId, loan, event)
+  createLoanSnapshot(loan, event)
 }
 
 export function handleExchangeRateUpdate(event: ExchangeRateUpdateEvent): void {

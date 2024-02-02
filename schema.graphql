@@ -10,6 +10,16 @@ type Lender @entity {
   shares: BigInt!
 }
 
+type LenderSnapshot @entity {
+  id: Bytes!
+  lender: Lender!
+  shares: BigInt!
+  lent: BigInt!
+  blockNumber: BigInt
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type Loan @entity {
   id: Bytes!
   tokenId: BigInt!
