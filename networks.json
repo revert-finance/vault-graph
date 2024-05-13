@@ -1,8 +1,8 @@
 {
-  "matic": {
+  "arbitrum-one": {
     "V3Vault": {
-      "address": "0x36023664dfab5e1cb3117191a3c356a59002580b",
-      "startBlock": 52665248
+      "address": "0xf6c04c9927e2b21b9634b4746ae7f21171ce0e4c",
+      "startBlock": 208648114
     }
   }
 }

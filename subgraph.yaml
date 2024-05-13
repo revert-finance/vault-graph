@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: V3Vault
-    network: matic
+    network: arbitrum-one
     source:
-      address: "0x36023664dfab5e1cb3117191a3c356a59002580b"
       abi: V3Vault
-      startBlock: 52665248
+      address: "0xf6c04c9927e2b21b9634b4746ae7f21171ce0e4c"
+      startBlock: 208648114
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -36,7 +36,7 @@ dataSources:
       eventHandlers:
         - event: Add(indexed uint256,address,uint256)
           handler: handleAdd
-        - event: Remove(indexed uint256,address)
+        - event: Remove(indexed uint256,address,address)
           handler: handleRemove
         - event: Borrow(indexed uint256,address,uint256,uint256)
           handler: handleBorrow
@@ -44,12 +44,14 @@ dataSources:
           handler: handleDeposit
         - event: ExchangeRateUpdate(uint256,uint256)
           handler: handleExchangeRateUpdate
-        - event: Liquidate(indexed uint256,address,address,uint256,uint256,uint256,uint256,uint256,uint256)
+        - event: Liquidate(indexed
+            uint256,address,address,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleLiquidate
         - event: Repay(indexed uint256,address,address,uint256,uint256)
           handler: handleRepay
         - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleWithdraw
-        - event: WithdrawCollateral(indexed uint256,address,address,uint128,uint256,uint256)
+        - event: WithdrawCollateral(indexed
+            uint256,address,address,uint128,uint256,uint256)
           handler: handleWithdrawCollateral
       file: ./src/v3vault.ts
