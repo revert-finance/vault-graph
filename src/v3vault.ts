@@ -124,11 +124,9 @@ export function handleAdd(event: Add): void {
   let loan = getLoan(event.params.tokenId, event.address)
   
   if (event.params.oldTokenId.gt(ZERO_BI)) {
-    let oldLoan = Loan.load(getBytes(event.params.oldTokenId))
-    if (oldLoan) {
-      loan.shares = oldLoan.shares
-      loan.previousLoan = oldLoan.id
-    }
+    let oldLoan = Loan.load(getBytes(event.params.oldTokenId).concat(event.address))!
+    loan.shares = oldLoan.shares
+    loan.previousLoan = oldLoan.id
   } else {
     loan.shares = ZERO_BI
   }
