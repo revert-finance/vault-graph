@@ -1,8 +1,8 @@
 {
   "arbitrum-one": {
     "V3Vault": {
-      "address": "0xf6c04c9927e2b21b9634b4746ae7f21171ce0e4c",
-      "startBlock": 208648114
+      "address": "0x74e6afef5705beb126c6d3bf46f8fad8f3e07825",
+      "startBlock": 240513631
     }
   }
 }
