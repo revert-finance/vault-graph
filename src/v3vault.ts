@@ -36,19 +36,35 @@ const ZERO_BI = BigInt.fromI32(0)
 const Q96 = BigDecimal.fromString(BigInt.fromI32(2).pow(96).toString())
 
 // max 1 snapshot per block is saved
-function createLoanSnapshot(loan: Loan, event: ethereum.Event) : void {
-
+function createLoanSnapshot(loan: Loan, event: ethereum.Event, isRemoveEvent: boolean = false) : void {
   // get current values
   let vault = V3Vault.bind(event.address)
-  let info = vault.loanInfo(loan.tokenId)
 
   let snapshot = new LoanSnapshot(loan.id.concat(event.address).concat(getBytes(event.block.number)))
-  
   snapshot.loan = loan.id
 
-  snapshot.debt = info.getDebt()
-  snapshot.collateralValue = info.getCollateralValue()
-  snapshot.fullValue = info.getFullValue()
+  // Try to get loan info, but handle the case where it reverts
+  let infoResult = vault.try_loanInfo(loan.tokenId)
+
+  if (!infoResult.reverted) {
+    // Normal case - we got valid loan info
+    let info = infoResult.value
+    snapshot.debt = info.getDebt()
+    snapshot.collateralValue = info.getCollateralValue()
+    snapshot.fullValue = info.getFullValue()
+  } else {
+    // The loan info call reverted
+
+    // Only set zeros for Remove events, otherwise skip creating the snapshot
+    if (isRemoveEvent) {
+      snapshot.debt = ZERO_BI
+      snapshot.collateralValue = ZERO_BI
+      snapshot.fullValue = ZERO_BI
+    } else {
+      // For other events, just return without creating a snapshot
+      return
+    }
+  }
 
   snapshot.shares = loan.shares
   snapshot.owner = loan.owner
@@ -68,7 +84,7 @@ function createLenderSnapshot(lender: Lender, event: ethereum.Event) : void {
   let lent = vault.lendInfo(Address.fromBytes(lender.address))
 
   let snapshot = new LenderSnapshot(lender.id.concat(event.address).concat(getBytes(event.block.number)))
-  
+
   snapshot.lender = lender.id
 
   snapshot.lent = lent
@@ -120,9 +136,8 @@ function getLender(address: Address, vaultAddress: Address): Lender {
 }
 
 export function handleAdd(event: Add): void {
-
   let loan = getLoan(event.params.tokenId, event.address)
-  
+
   if (event.params.oldTokenId.gt(ZERO_BI)) {
     let oldLoan = Loan.load(getBytes(event.params.oldTokenId).concat(event.address))!
     loan.shares = oldLoan.shares
@@ -130,11 +145,12 @@ export function handleAdd(event: Add): void {
   } else {
     loan.shares = ZERO_BI
   }
-  
+
   loan.owner = event.params.owner
   loan.save()
 
-  createLoanSnapshot(loan, event)
+  // Pass false to indicate this is not a Remove event
+  createLoanSnapshot(loan, event, false)
 }
 
 export function handleRemove(event: Remove): void {
@@ -142,7 +158,8 @@ export function handleRemove(event: Remove): void {
   loan.isExited = true
   loan.save()
 
-  createLoanSnapshot(loan, event)
+  // Pass true to indicate this is a Remove event
+  createLoanSnapshot(loan, event, true)
 }
 
 export function handleBorrow(event: BorrowEvent): void {
@@ -150,7 +167,7 @@ export function handleBorrow(event: BorrowEvent): void {
   loan.shares = loan.shares.plus(event.params.shares)
   loan.save()
 
-  createLoanSnapshot(loan, event)
+  createLoanSnapshot(loan, event, false)
 }
 
 export function handleRepay(event: RepayEvent): void {
@@ -158,7 +175,7 @@ export function handleRepay(event: RepayEvent): void {
   loan.shares = loan.shares.minus(event.params.shares)
   loan.save()
 
-  createLoanSnapshot(loan, event)
+  createLoanSnapshot(loan, event, false)
 }
 
 export function handleDeposit(event: DepositEvent): void {
@@ -179,7 +196,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
 
 export function handleWithdrawCollateral(event: WithdrawCollateralEvent) : void {
   let loan = getLoan(event.params.tokenId, event.address)
-  createLoanSnapshot(loan, event)
+  createLoanSnapshot(loan, event, false)
 }
 
 export function handleExchangeRateUpdate(event: ExchangeRateUpdateEvent): void {
@@ -224,7 +241,7 @@ export function handleLiquidate(event: LiquidateEvent): void {
 
   liquidation.amount0 = event.params.amount0
   liquidation.amount1 = event.params.amount1
-  
+
   liquidation.reserve = event.params.reserve
   liquidation.missing = event.params.missing
 
