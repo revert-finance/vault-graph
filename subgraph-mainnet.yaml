@@ -1,0 +1,57 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: V3Vault
+    network: mainnet
+    source:
+      abi: V3Vault
+      address: "0xa2754543f69dc036764bbfad16d2a74f5cd15667"
+      startBlock: 22734461
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Borrow
+        - Deposit
+        - ExchangeRateUpdate
+        - Liquidate
+        - OwnershipTransferred
+        - Repay
+        - SetLimits
+        - SetReserveFactor
+        - SetReserveProtectionFactor
+        - SetTokenConfig
+        - SetTransformer
+        - Transfer
+        - Withdraw
+        - WithdrawCollateral
+        - WithdrawReserves
+      abis:
+        - name: V3Vault
+          file: ./abis/V3Vault.json
+      eventHandlers:
+        - event: Add(indexed uint256,address,uint256)
+          handler: handleAdd
+        - event: Remove(indexed uint256,address,address)
+          handler: handleRemove
+        - event: Borrow(indexed uint256,address,uint256,uint256)
+          handler: handleBorrow
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: ExchangeRateUpdate(uint256,uint256)
+          handler: handleExchangeRateUpdate
+        - event: Liquidate(indexed
+            uint256,address,address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLiquidate
+        - event: Repay(indexed uint256,address,address,uint256,uint256)
+          handler: handleRepay
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: WithdrawCollateral(indexed
+            uint256,address,address,uint128,uint256,uint256)
+          handler: handleWithdrawCollateral
+      file: ./src/v3vault.ts 

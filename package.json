@@ -3,8 +3,12 @@
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
-    "build": "graph build --network arbitrum-one",
-    "deploy": "graph deploy --network arbitrum-one --studio revert-vault-arbitrum"
+    "build:arbitrum": "graph build --network arbitrum-one subgraph-arbitrum.yaml",
+    "build:base": "graph build --network base subgraph-base.yaml",
+    "build:mainnet": "graph build --network mainnet subgraph-mainnet.yaml",
+    "deploy:arbitrum": "graph deploy --studio revert-vault-arbitrum subgraph-arbitrum.yaml",
+    "deploy:base": "graph deploy --studio revert-vault-base subgraph-base.yaml",
+    "deploy:mainnet": "graph deploy --studio revert-vault-mainnet subgraph-mainnet.yaml"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.63.1",
