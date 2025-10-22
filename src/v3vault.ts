@@ -36,7 +36,7 @@ const ZERO_BI = BigInt.fromI32(0)
 const Q96 = BigDecimal.fromString(BigInt.fromI32(2).pow(96).toString())
 
 // max 1 snapshot per block is saved
-function createLoanSnapshot(loan: Loan, event: ethereum.Event, isRemoveEvent: boolean = false) : void {
+function createLoanSnapshot(loan: Loan, event: ethereum.Event, isRemoveEvent: boolean = false, amountRepaid: BigInt | null = null, amountBorrowed: BigInt | null = null) : void {
   // get current values
   let vault = V3Vault.bind(event.address)
 
@@ -72,6 +72,10 @@ function createLoanSnapshot(loan: Loan, event: ethereum.Event, isRemoveEvent: bo
   snapshot.blockNumber = event.block.number
   snapshot.blockTimestamp = event.block.timestamp
   snapshot.transactionHash = event.transaction.hash
+
+  // Set the actual amounts if provided
+  snapshot.amountRepaid = amountRepaid
+  snapshot.amountBorrowed = amountBorrowed
 
   snapshot.save()
 }
@@ -167,7 +171,7 @@ export function handleBorrow(event: BorrowEvent): void {
   loan.shares = loan.shares.plus(event.params.shares)
   loan.save()
 
-  createLoanSnapshot(loan, event, false)
+  createLoanSnapshot(loan, event, false, null, event.params.assets)
 }
 
 export function handleRepay(event: RepayEvent): void {
@@ -175,7 +179,7 @@ export function handleRepay(event: RepayEvent): void {
   loan.shares = loan.shares.minus(event.params.shares)
   loan.save()
 
-  createLoanSnapshot(loan, event, false)
+  createLoanSnapshot(loan, event, false, event.params.assets, null)
 }
 
 export function handleDeposit(event: DepositEvent): void {

@@ -42,6 +42,8 @@ type LoanSnapshot @entity {
   blockNumber: BigInt
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  amountRepaid: BigInt
+  amountBorrowed: BigInt
 }
 
 type DailyExchangeRate @entity {
