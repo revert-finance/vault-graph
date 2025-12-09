@@ -1,4 +1,22 @@
 {
+  "base": {
+    "V3Vault": {
+      "address": "0x36aeae0e411a1e28372e0d66f02e57744ebe7599",
+      "startBlock": 31782197
+    }
+  },
+  "base-aerodrome": {
+    "V3Vault": {
+      "address": "0x22ce292d882c7799183949509b011512352454cb",
+      "startBlock": 39083195
+    }
+  },
+  "mainnet": {
+    "V3Vault": {
+      "address": "0xa2754543f69dc036764bbfad16d2a74f5cd15667",
+      "startBlock": 22734461
+    }
+  },
   "arbitrum-one": {
     "V3Vault": {
       "address": "0x74e6afef5705beb126c6d3bf46f8fad8f3e07825",
