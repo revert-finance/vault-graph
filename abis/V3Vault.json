@@ -42,8 +42,8 @@
     "outputs": [
       {
         "name": "",
-        "type": "uint32",
-        "internalType": "uint32"
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
@@ -305,44 +305,6 @@
         "name": "recipient",
         "type": "address",
         "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "createWithPermit",
-    "inputs": [
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "recipient",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "deadline",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "v",
-        "type": "uint8",
-        "internalType": "uint8"
-      },
-      {
-        "name": "r",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "s",
-        "type": "bytes32",
-        "internalType": "bytes32"
       }
     ],
     "outputs": [],
@@ -754,11 +716,6 @@
             "name": "recipient",
             "type": "address",
             "internalType": "address"
-          },
-          {
-            "name": "permitData",
-            "type": "bytes",
-            "internalType": "bytes"
           },
           {
             "name": "deadline",
@@ -1661,6 +1618,57 @@
   },
   {
     "type": "function",
+    "name": "transformWithRewardCompound",
+    "inputs": [
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "transformer",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "rewardParams",
+        "type": "tuple",
+        "internalType": "struct IVault.RewardCompoundParams",
+        "components": [
+          {
+            "name": "minAeroReward",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "aeroSplitBps",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "deadline",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "newTokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "transformedTokenId",
     "inputs": [],
     "outputs": [
@@ -1953,19 +1961,6 @@
   },
   {
     "type": "event",
-    "name": "GaugeManagerSet",
-    "inputs": [
-      {
-        "name": "gaugeManager",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "Liquidate",
     "inputs": [
       {
@@ -2133,6 +2128,19 @@
         "name": "emergencyAdmin",
         "type": "address",
         "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SetGaugeManager",
+    "inputs": [
+      {
+        "name": "gaugeManager",
+        "type": "address",
+        "indexed": true,
         "internalType": "address"
       }
     ],
@@ -2411,12 +2419,22 @@
   },
   {
     "type": "error",
+    "name": "DebtChanged",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "EtherSendFailed",
     "inputs": []
   },
   {
     "type": "error",
     "name": "ExceedsMaxReward",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "GaugeManagerAlreadySet",
     "inputs": []
   },
   {
@@ -2437,6 +2455,11 @@
   {
     "type": "error",
     "name": "InsufficientLiquidity",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InterestNotUpdated",
     "inputs": []
   },
   {
@@ -2507,6 +2530,11 @@
   {
     "type": "error",
     "name": "NotReady",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotStaked",
     "inputs": []
   },
   {
@@ -2612,11 +2640,6 @@
   {
     "type": "error",
     "name": "WrongContract",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "ZeroAddress",
     "inputs": []
   }
 ]

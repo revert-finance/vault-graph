@@ -7,8 +7,8 @@ dataSources:
     network: base
     source:
       abi: V3Vault
-      address: "0x22ce292d882c7799183949509b011512352454cb"
-      startBlock: 39083195
+      address: "0x1EF7C181188687e20A9750714f1b9DE6F70f17C0"
+      startBlock: 46829046
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
