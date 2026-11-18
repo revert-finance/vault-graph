@@ -175,7 +175,15 @@ export function handleBorrow(event: BorrowEvent): void {
 }
 
 export function handleRepay(event: RepayEvent): void {
-  let loan = getLoan(event.params.tokenId, event.address)
+  // repay() is permissionless and emits Repay even for a tokenId that has no
+  // loan (e.g. a zero-amount repay of tokenId 1 with owner 0x0, Base block
+  // 58812512, 2026-11-17). getLoan would create a Loan with no shares/owner and
+  // shares.minus() would abort the mapping, halting the subgraph. A repay of a
+  // loan we never saw has nothing to update, so ignore it.
+  let loan = Loan.load(getBytes(event.params.tokenId).concat(event.address))
+  if (!loan) {
+    return
+  }
   loan.shares = loan.shares.minus(event.params.shares)
   loan.save()
 
