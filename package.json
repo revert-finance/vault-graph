@@ -6,10 +6,12 @@
     "build:arbitrum": "graph build --network arbitrum-one subgraph-arbitrum.yaml",
     "build:base": "graph build --network base subgraph-base.yaml",
     "build:base-aerodrome": "graph build subgraph-base-aerodrome.yaml",
+    "build:base-aero": "graph build subgraph-base-aero.yaml",
     "build:mainnet": "graph build --network mainnet subgraph-mainnet.yaml",
     "deploy:arbitrum": "graph deploy --studio revert-vault-arbitrum subgraph-arbitrum.yaml",
     "deploy:base": "graph deploy --studio revert-vault-base subgraph-base.yaml",
     "deploy:base-aerodrome": "graph deploy --studio revert-vault-base-aerodrome subgraph-base-aerodrome.yaml",
+    "deploy:base-aero": "graph deploy --studio revert-vault-base-aero subgraph-base-aero.yaml",
     "deploy:mainnet": "graph deploy --studio revert-vault-mainnet subgraph-mainnet.yaml"
   },
   "dependencies": {

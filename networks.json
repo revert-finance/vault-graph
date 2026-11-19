@@ -22,5 +22,11 @@
       "address": "0x74e6afef5705beb126c6d3bf46f8fad8f3e07825",
       "startBlock": 240513631
     }
+  },
+  "base-aero": {
+    "V3Vault": {
+      "address": "0x4a315e98d87c049b92e31a677a4dec63f4ef8f7f",
+      "startBlock": 53578457
+    }
   }
 }
